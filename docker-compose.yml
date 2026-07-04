@@ -1,36 +1,36 @@
 services:
   backend:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
       target: dev
     container_name: retainly_backend
     restart: no
     command: python -m uvicorn app.core.main:app --host 0.0.0.0 --port 8000 --reload
     env_file:
-      - ./backend/.env
-      - ./backend/.env.dev
+      - .env
+      - .env.dev
     volumes:
-      - ./backend:/retainly/backend
-      - ./media:/retainly/media # Mount media dir for development
-      - /retainly/backend/.venv # Anonymous volume to protect .venv
+      - ./:/retainly-backend
+      - ./STORAGE:/retainly-backend/STORAGE
+      - /retainly-backend/.venv # Anonymous volume to protect .venv
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
     ports:
       - "8000:8000"
 
-  db:
+  postgres:
     image: postgres:18-alpine
-    container_name: retainly_db
+    container_name: retainly_postgres
     restart: no
     env_file:
-      - ./backend/.env
-      - ./backend/.env.dev
+      - .env
+      - .env.dev
     volumes:
-      - postgres_retainly_data:/var/lib/postgresql/data
+      - postgres_retainly_data:/var/lib/postgresql
     ports:
       - "5432:5432"
     healthcheck:
@@ -45,8 +45,8 @@ services:
     container_name: retainly_redis
     restart: no
     env_file:
-      - ./backend/.env
-      - ./backend/.env.dev
+      - .env
+      - .env.dev
     command: sh -c "exec redis-server --appendonly yes --requirepass $$REDIS_PASSWORD"
     volumes:
       - redis_retainly_data:/data
@@ -58,18 +58,18 @@ services:
 
   celery_worker:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
       target: dev
     container_name: retainly_celery_worker
     restart: no
     env_file:
-      - ./backend/.env
-      - ./backend/.env.dev
+      - .env
+      - .env.dev
     volumes:
-      - ./backend/app:/retainly/backend/app
-      - ./media:/retainly/media # Mount media dir for development
-      # - /retainly/backend/.venv  # Anonymous volume to protect .venv
+      - ./app:/retainly-backend/app
+      - ./STORAGE:/retainly-backend/STORAGE
+      - /retainly-backend/.venv  # Anonymous volume to protect .venv
     depends_on:
       - backend
       - redis
@@ -77,18 +77,18 @@ services:
 
   celery_beat:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
       target: dev
     container_name: retainly_celery_beat
     restart: no
     env_file:
-      - ./backend/.env
-      - ./backend/.env.dev
+      - .env
+      - .env.dev
     volumes:
-      - ./backend/app:/retainly/backend/app
-      - ./media:/retainly/media # Mount media dir for development
-      # - /retainly/backend/.venv  # Anonymous volume to protect .venv
+      - ./app:/retainly-backend/app
+      - ./STORAGE:/retainly-backend/STORAGE
+      - /retainly-backend/.venv  # Anonymous volume to protect .venv
     depends_on:
       - backend
       - redis
@@ -96,17 +96,18 @@ services:
 
   flower:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
       target: dev
     container_name: retainly_flower
     restart: no
     env_file:
-      - ./backend/.env
-      - ./backend/.env.dev
+      - .env
+      - .env.dev
     volumes:
-      - ./backend/app:/retainly/backend/app
-      # - /retainly/backend/.venv  # Anonymous volume to protect .venv
+      - ./app:/retainly-backend/app
+      - ./STORAGE:/retainly-backend/STORAGE
+      - /retainly-backend/.venv  # Anonymous volume to protect .venv
     ports:
       - "5555:5555"
     depends_on:
@@ -121,7 +122,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      - postgres
 
 volumes:
   postgres_retainly_data:

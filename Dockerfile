@@ -4,13 +4,13 @@ FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS base
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /retainly/backend
+WORKDIR /retainly-backend
 
-ENV VIRTUAL_ENV=/retainly/backend/.venv
+ENV VIRTUAL_ENV=/retainly-backend/.venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 RUN useradd -m -u 1000 appuser
-RUN mkdir -p /retainly/media && chown -R appuser:appuser /retainly /retainly/media
+RUN chown -R appuser:appuser /retainly-backend
 
 RUN apt-get update && \
     apt-get install -y libmagic1 && \
@@ -21,6 +21,10 @@ USER appuser
 
 # --- 2. The "Development/Testing" Stage ---
 FROM base AS dev
+
+RUN mkdir -p /retainly-backend/STORAGE
+RUN chown -R appuser:appuser /retainly-backend/STORAGE
+
 
 COPY --chown=appuser:appuser pyproject.toml .python-version uv.lock* ./
 
