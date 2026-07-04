@@ -3,7 +3,7 @@ version: "3"
 vars:
   SERVICE: "backend"
 
-  VENV_ACTIVATE: "/retainly/backend/.venv/bin/activate"
+  VENV_ACTIVATE: "/retainly-backend/.venv/bin/activate"
 
   COMPOSE_DEV: "docker compose -f docker-compose.yml"
 
