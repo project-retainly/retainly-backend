@@ -1,0 +1,67 @@
+{
+  // Disable global formatting
+  "editor.formatOnSave": true,
+
+  // Only run Prettier if config exists
+  "prettier.requireConfig": true,
+
+  // ESLint fixes (non-formatting issues)
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always",
+  },
+
+
+  // ---- HTML ----
+  "[html]": {
+    "editor.formatOnSave": true,
+		"editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // ---- JavaScript ----
+  "[javascript]": {
+    "editor.formatOnSave": true,
+		"editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // ---- JSX ----
+  "[javascriptreact]": {
+    "editor.formatOnSave": true,
+		"editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // ---- TypeScript ----
+  "[typescript]": {
+    "editor.formatOnSave": true,
+		"editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // ---- TSX ----
+  "[typescriptreact]": {
+    "editor.formatOnSave": true,
+		"editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // ---- JSON ----
+  "[json]": {
+		"editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "[jsonc]": {
+		"editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "python-envs.pythonProjects": [
+    {
+      "path": ".",
+      "envManager": "ms-python.python:venv",
+      "packageManager": "ms-python.python:pip"
+    }
+  ],
+
+}

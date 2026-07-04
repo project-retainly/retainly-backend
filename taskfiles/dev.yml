@@ -1,0 +1,67 @@
+version: "3"
+
+vars:
+  SERVICE: "backend"
+
+  VENV_ACTIVATE: "/retainly/backend/.venv/bin/activate"
+
+  COMPOSE_DEV: "docker compose -f docker-compose.yml"
+
+  COMPOSE_TEST: "{{.COMPOSE_DEV}} -f docker-compose.test.yml -p retainly_project_test"
+
+  # Command Shortcuts
+  SHELL: "{{.COMPOSE_DEV}} exec -it {{.SERVICE}} bash"
+  PYSHELL: '{{.SHELL}} -c "source {{.VENV_ACTIVATE}} && ipython"'
+
+  # Arguments
+  UP: "up --build"
+  UPD: "up --build -d"
+  DOWN: "down"
+
+  PYTEST: "run --build --rm backend pytest -s"
+  PYTEST_COV: "{{.PYTEST}} --cov=app --cov-report=html --cov-report=term-missing"
+  PYTEST_DOWN: "{{.COMPOSE_TEST}} down"
+
+tasks:
+  compose:
+    desc: "Pass through any docker compose command to the dev environment"
+    cmds:
+      - "{{.COMPOSE_DEV}} {{.CLI_ARGS}}"
+
+  up:
+    desc: "Build and start development environment (Logs in foreground)"
+    cmds:
+      - "{{.COMPOSE_DEV}} {{.UP}} {{.CLI_ARGS}}"
+
+  upd:
+    desc: "Build and start development environment (Detached / Background)"
+    cmds:
+      - "{{.COMPOSE_DEV}} {{.UPD}} {{.CLI_ARGS}}"
+
+  down:
+    desc: "Stop development environment"
+    cmds:
+      - "{{.COMPOSE_DEV}} {{.DOWN}} {{.CLI_ARGS}}"
+
+  test:
+    desc: "Run pytest in test environment"
+    # Usage: task test -- -k specific_test
+    cmds:
+      - "{{.COMPOSE_TEST}} {{.PYTEST}} {{.CLI_ARGS}} && {{.PYTEST_DOWN}}"
+
+  testcov:
+    desc: "Run pytest in test environment (Auto-starts & stops DB)"
+    cmds:
+      - "{{.COMPOSE_TEST}} {{.PYTEST_COV}} {{.CLI_ARGS}} && {{.PYTEST_DOWN}}"
+
+  shell:
+    desc: "Connect to running container shell (Container must be UP)"
+    cmds:
+      - "{{.SHELL}} {{.CLI_ARGS}}"
+    interactive: true
+
+  pyshell:
+    desc: "Connect to running container and start IPython"
+    cmds:
+      - "{{.PYSHELL}} {{.CLI_ARGS}}"
+    interactive: true

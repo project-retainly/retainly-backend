@@ -1,0 +1,28 @@
+version: "3"
+
+vars:
+  COMPOSE_DEV: "docker compose -f docker-compose.yml"
+
+  GENERATE_MIGRATION: "run --build --rm backend alembic revision --autogenerate -m "
+
+  APPLY_MIGRATIONS: "run --build --rm backend alembic upgrade head"
+
+  REVERT_MIGRATION: "run --build --rm backend alembic downgrade"
+
+  COMPOSE_DEV_STOP: "{{.COMPOSE_DEV}} stop"
+
+tasks:
+  gen:
+    desc: "Generate new migration file."
+    cmds:
+      - "{{.COMPOSE_DEV}} {{.GENERATE_MIGRATION}} {{.CLI_ARGS}} && {{.COMPOSE_DEV_STOP}}"
+
+  up:
+    desc: "Apply database migrations."
+    cmds:
+      - "{{.COMPOSE_DEV}} {{.APPLY_MIGRATIONS}} {{.CLI_ARGS}} && {{.COMPOSE_DEV_STOP}}"
+
+  down:
+    desc: "Revert the specified database migration."
+    cmds:
+      - "{{.COMPOSE_DEV}} {{.REVERT_MIGRATION}} {{.CLI_ARGS}} && {{.COMPOSE_DEV_STOP}}"

@@ -1,0 +1,27 @@
+# .dockerignore
+
+# The biggest culprit: Git history (can be huge)
+.git
+.gitignore
+
+# Python caches
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Local Virtual Environments (Never send these!)
+venv
+env
+.venv
+
+# VS Code settings
+.vscode
+
+# Docker files themselves
+docker-compose*.yml
+Dockerfile
+.dockerignore
+
+# Generate test coverage dir
+coverage

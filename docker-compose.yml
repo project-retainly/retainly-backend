@@ -1,0 +1,128 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: dev
+    container_name: retainly_backend
+    restart: no
+    command: python -m uvicorn app.core.main:app --host 0.0.0.0 --port 8000 --reload
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.dev
+    volumes:
+      - ./backend:/retainly/backend
+      - ./media:/retainly/media # Mount media dir for development
+      - /retainly/backend/.venv # Anonymous volume to protect .venv
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  db:
+    image: postgres:18-alpine
+    container_name: retainly_db
+    restart: no
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.dev
+    volumes:
+      - postgres_retainly_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      # Note: Use $$ to use container-level env vars, not host-level
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: retainly_redis
+    restart: no
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.dev
+    command: sh -c "exec redis-server --appendonly yes --requirepass $$REDIS_PASSWORD"
+    volumes:
+      - redis_retainly_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "$$REDIS_PASSWORD", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: dev
+    container_name: retainly_celery_worker
+    restart: no
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.dev
+    volumes:
+      - ./backend/app:/retainly/backend/app
+      - ./media:/retainly/media # Mount media dir for development
+      # - /retainly/backend/.venv  # Anonymous volume to protect .venv
+    depends_on:
+      - backend
+      - redis
+    command: watchfiles "celery -A app.celery worker --loglevel=info" app
+
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: dev
+    container_name: retainly_celery_beat
+    restart: no
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.dev
+    volumes:
+      - ./backend/app:/retainly/backend/app
+      - ./media:/retainly/media # Mount media dir for development
+      # - /retainly/backend/.venv  # Anonymous volume to protect .venv
+    depends_on:
+      - backend
+      - redis
+    command: watchfiles "celery -A app.celery beat --loglevel=info" app
+
+  flower:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: dev
+    container_name: retainly_flower
+    restart: no
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.dev
+    volumes:
+      - ./backend/app:/retainly/backend/app
+      # - /retainly/backend/.venv  # Anonymous volume to protect .venv
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - celery_worker
+    command: sh -c "exec celery -A app.celery flower --port=5555 --basic_auth=$$FLOWER_USER:$$FLOWER_PASSWORD"
+
+  adminer:
+    image: adminer:latest
+    container_name: retainly_adminer
+    restart: no
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  postgres_retainly_data:
+  redis_retainly_data:

@@ -1,0 +1,39 @@
+services:
+  backend:
+    command: pytest -s
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.dev
+      - ./backend/.env.test
+    volumes:
+      - ./backend:/retainly/backend
+      - /retainly/backend/.venv # Anonymous volume to protect .venv
+
+  # Disable workers during unit tests (unless you specifically test async tasks)
+  # Setting profiles to 'donotstart' effectively disables them
+  celery_worker:
+    profiles: ["donotstart"]
+  celery_beat:
+    profiles: ["donotstart"]
+  flower:
+    profiles: ["donotstart"]
+
+  db:
+    # Use tmpfs for DB storage -> Much faster tests, data wiped on exit
+    container_name: retainly_test_db
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.dev
+      - ./backend/.env.test
+    volumes: !reset []
+    tmpfs:
+      - /var/lib/postgresql/data
+    ports: [] # Don't expose ports in CI
+
+  redis:
+    container_name: retainly_test_redis
+    env_file:
+      - ./backend/.env
+      - ./backend/.env.dev
+      - ./backend/.env.test
+    ports: []

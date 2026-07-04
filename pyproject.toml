@@ -1,0 +1,81 @@
+[project]
+name = "retainly-backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "alembic>=1.17.1",
+    "asyncpg>=0.30.0",
+    "bcrypt<4.1.0",
+    "celery>=5.5.3",
+    "fastapi[standard]>=0.128.0",
+    "flower>=2.0.1",
+    "passlib[bcrypt]>=1.7.4",
+    "pydantic[email]>=2.12.3",
+    "pydantic-settings>=2.11.0",
+    "python-jose[cryptography]>=3.5.0",
+    "redis>=7.1.0",
+    "sqlalchemy>=2.0.44",
+    "fastapi-mail>=1.6.0",
+    "python-slugify>=8.0.4",
+    "fastapi-pagination[sqlalchemy]>=0.15.6",
+    "regex>=2025.11.3",
+    "aiofiles>=25.1.0",
+    "python-magic>=0.4.27",
+    "structlog>=25.5.0",
+    "psycopg2-binary>=2.9.11",
+    "gunicorn>=25.3.0",
+    "nanoid>=2.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "async-factory-boy>=1.0.1",
+    "coverage>=7.13.2",
+    "fakeredis>=2.32.1",
+    "httpx>=0.28.1",
+    "ipython>=9.9.0",
+    "pytest>=8.4.2",
+    "pytest-anyio>=0.0.0",
+    "pytest-asyncio>=1.2.0",
+    "pytest-cov>=7.0.0",
+    "pytest-dotenv>=0.5.2",
+    "ruff>=0.14.13",
+]
+
+[tool.coverage.run]
+source = ["app"]
+data_file = "coverage/.coverage"
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/.venv/*",
+    "*/migrations/*",
+]
+branch = true
+concurrency = ["greenlet"]
+
+[tool.coverage.html]
+directory = "coverage/htmlcov"
+
+[tool.coverage.report]
+show_missing = true
+precision = 2
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = [
+    "--tb=short",
+    "--maxfail=5",
+]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[tool.ruff.format]
+quote-style = "double"

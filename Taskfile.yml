@@ -1,0 +1,15 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  TASKFILES_DIR: ./taskfiles
+
+includes:
+  dev:
+    taskfile: "{{.TASKFILES_DIR}}/dev.yml"
+    desc: "Collection of development tasks."
+
+  migrate:
+    taskfile: "{{.TASKFILES_DIR}}/migrate.yml"
+    desc: "Collection of alembic migration tasks."
