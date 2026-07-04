@@ -11,15 +11,14 @@ class Settings(BaseSettings):
         extra="ignore",
     )
     REGISTRATION_OPEN: bool
-    PROJECT_DIR: ClassVar[Path] = Path(__file__).resolve().parent.parent.parent.parent
+    BACKEND_DIR: ClassVar[Path] = Path(__file__).resolve().parent.parent.parent
 
-    BACKEND_DIR: ClassVar[Path] = PROJECT_DIR / "backend"
     APP_DIR: ClassVar[Path] = BACKEND_DIR / "app"
 
     # --- MEDIA STORAGE SETTINGS ---
 
     # default to local "static" folder, can be overridden by env var
-    MEDIA_DIR: Path = PROJECT_DIR / "media"
+    MEDIA_DIR: Path = BACKEND_DIR / "STORAGE"
 
     # If True, will use S3 or other cloud storage instead of local filesystem
     USE_CLOUD_STORAGE: bool
