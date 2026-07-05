@@ -2,6 +2,9 @@
 test_generation_prompt.txt
 temp*.txt
 
+STORAGE/*
+!STORAGE/.gitkeep
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

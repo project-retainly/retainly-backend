@@ -1,8 +1,6 @@
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.common import time_utils as TU
-from app.common.constants import DateFormat as DF
 from app.media.services import MediaService
 from app.media.utils import StaticDirs
 
@@ -16,14 +14,4 @@ class TestMediaServiceGetFilePath:
         final_filename = "test_file.jpg"
         directory = StaticDirs.Uploads.TEMP
         result = media_service._get_file_path(final_filename, directory)
-        assert (
-            result
-            == f"{StaticDirs.Uploads.TEMP}/{TU.utc_now_format(DF.YYYYMMDD)}/{final_filename}"
-        )
-
-    async def test_uses_current_date_in_path(self, media_service):
-        final_filename = "image.png"
-        directory = "uploads"
-        result = media_service._get_file_path(final_filename, directory)
-        expected_date = TU.utc_now_format(DF.YYYYMMDD)
-        assert f"/{expected_date}/" in result
+        assert result == f"{StaticDirs.Uploads.TEMP}/{final_filename}"
